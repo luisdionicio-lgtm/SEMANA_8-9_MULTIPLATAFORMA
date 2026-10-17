@@ -17,7 +17,9 @@ Abrir http://localhost:8082. Si Flutter está en PATH, basta con `flutter run -d
 
 También se incluye la tarea **Órbita: ejecutar Flutter Web**: `Ctrl + Shift + B` abre la terminal integrada y ejecuta el proyecto. `.vscode/settings.json` apunta al SDK instalado en esta PC; ajustar esa ruta si se clona en otro equipo. La configuración de depuración con F5 usa Chrome en el puerto 8081.
 
-Acceso de demostración: **demo@orbita.pe** / **Demo2026!**. El botón «Completar datos de prueba» completa el formulario. Para detener Flutter, `Ctrl + C` en su terminal.
+Acceso demo: `demo@orbita.pe` / `Demo2026!`  
+
+El botón «Completar datos de prueba» completa el formulario. Para detener Flutter, `Ctrl + C` en su terminal.
 
 ## Pantallas y funciones
 
