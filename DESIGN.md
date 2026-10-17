@@ -109,7 +109,7 @@ Ink sostiene títulos claros; muted corresponde al texto secundario. Canvas es e
 
 ## Typography
 
-Manrope es la familia global, empaquetada en archivos estáticos con pesos 400, 500, 600, 700 y 800. La escala normativa está en el frontmatter; px representa los píxeles lógicos Flutter. Headline-large identifica el acceso, headline-medium los encabezados interiores y title-large las secciones. Body-large usa 16px y cuerpo medio 13px. El logotipo tiene una excepción local de 29px, peso 800 y tracking -1.2px. No se declara fuente variable.
+Manrope es la familia global, empaquetada en archivos estáticos con pesos 400, 500, 600, 700 y 800. La escala normativa está en el frontmatter; px representa los píxeles lógicos Flutter. Headline-large identifica el acceso, headline-medium los encabezados interiores y title-large las secciones. Body-large usa 16px y cuerpo medio 13px. El logotipo tiene una excepción local de 29px, peso 800 y tracking -1.1px. No se declara fuente variable.
 
 ## Layout
 
@@ -135,7 +135,7 @@ Controles y botones comparten esquinas suaves; las tarjetas tienen una curva may
 - **Photo:** FadeInImage con asset local y placeholder en memoria sobre mint; aparición de 220ms, reducida a 1ms cuando MediaQuery desactiva animaciones. Ante error muestra un icono de dispositivos.
 - **Feedback:** SnackBar flotante forest con texto canvas para confirmaciones.
 
-- **DiscoveryCarousel:** cuatro colecciones fotográficas (Laptops, Audio, Periféricos y Monitores), alto de 320px y radio de 18px. Títulos de 29px/peso 800, texto de 12px, padding de 24px y degradado oscuro. Flechas e indicadores seleccionan página en 250ms con Cubic(.23,1,.32,1); teclado o movimiento reducido cambian directamente. Los indicadores amplían su ancho de 6px a 22px durante 160ms (duración cero con movimiento reducido), con área de pulsación de 44px.
+- **DiscoveryCarousel:** cuatro colecciones fotográficas (Laptops, Audio, Periféricos y Monitores), alto de 320px y radio de 18px. Títulos de 29px/peso 800, texto de 12px, padding de 24px y degradado oscuro. Flechas e indicadores seleccionan página en 250ms con Cubic(.23,1,.32,1); teclado o movimiento reducido cambian directamente. Los indicadores mantienen un ancho de 22px y animan su escala horizontal de 0.3 a 1 durante 160ms (duración cero con movimiento reducido), con área de pulsación de 44px.
 - **ProductCarousel:** tarjetas horizontales de 260px de alto, viewportFraction de 0.86, sin padding en los extremos y separación derecha de 14px. Fotografías de 160px, contenido con padding de 16px, nombre de una línea y precio lavanda. El desplazamiento por páginas admite ratón y toque; la tarjeta abre el catálogo.
 - **Inicio y perfil:** el inicio organiza colecciones, carrusel de productos y acceso compacto al registro. El perfil presenta información editable en formato compacto, sin fotografía de gran tamaño.
 
@@ -152,3 +152,5 @@ Controles y botones comparten esquinas suaves; las tarjetas tienen una curva may
 - **Don't** añadir sombras a las tarjetas que se definen con elevación cero.
 - **Don't** interpretar forest y mint como colores verdes: los tokens actuales son lavanda y azul.
 - **Don't** declarar una fuente variable o pesos sin los archivos correspondientes.
+
+La posición de desplazamiento se reinicia al cambiar de pantalla mediante una clave propia del contenedor de scroll.
