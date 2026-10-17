@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/product.dart';
 import '../services/app_store.dart';
 import '../theme/app_theme.dart';
@@ -18,7 +20,8 @@ class _ProductFormState extends State<ProductForm> {
       description = TextEditingController(),
       price = TextEditingController();
   String category = categories.first;
-  bool saving = false;
+  String? photo;
+  bool saving = false, picking = false;
   @override
   void dispose() {
     name.dispose();
@@ -27,238 +30,193 @@ class _ProductFormState extends State<ProductForm> {
     super.dispose();
   }
 
+  // El selector usa memoria y datos base64 para funcionar también en Flutter web.
+  // La imagen se guarda junto al producto; no se envía a servicios externos.
+  Future<void> pick() async {
+    if (picking) return;
+    setState(() => picking = true);
+    try {
+      final file = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 80,
+      );
+      if (file == null) return;
+      final bytes = await file.readAsBytes();
+      if (!mounted) return;
+      if (bytes.length > 2 * 1024 * 1024) {
+        message(context, 'La imagen debe pesar menos de 2 MB.');
+        return;
+      }
+      final png =
+          bytes.length > 8 &&
+          bytes[0] == 137 &&
+          bytes[1] == 80 &&
+          bytes[2] == 78 &&
+          bytes[3] == 71;
+      final jpg = bytes.length > 3 && bytes[0] == 255 && bytes[1] == 216;
+      if (!png && !jpg) {
+        message(context, 'Selecciona una imagen JPG o PNG.');
+        return;
+      }
+      setState(
+        () => photo =
+            'data:image/${png ? 'png' : 'jpeg'};base64,${base64Encode(bytes)}',
+      );
+    } catch (_) {
+      if (mounted) message(context, 'No se pudo abrir la imagen.');
+    } finally {
+      if (mounted) setState(() => picking = false);
+    }
+  }
+
   Future<void> save() async {
     if (!form.currentState!.validate() || saving) return;
     setState(() => saving = true);
     try {
       await widget.store.add(
         Product(
-          id: 'NX-${DateTime.now().microsecondsSinceEpoch}',
+          id: 'OR-${DateTime.now().microsecondsSinceEpoch}',
           name: name.text.trim(),
           description: description.text.trim(),
           cents: parseCents(price.text)!,
           category: category,
-          image: categoryImage(category),
+          image: photo ?? categoryImage(category),
         ),
       );
       if (!mounted) return;
-      message(context, 'Producto guardado. Ya está en tu catálogo.');
+      message(context, 'Producto guardado.');
       widget.onSaved();
     } catch (_) {
       if (mounted) {
         setState(() => saving = false);
         message(
           context,
-          'No se pudo guardar. Revisa el almacenamiento del navegador e inténtalo otra vez.',
+          'No se pudo guardar. Revisa el espacio del navegador.',
         );
       }
     }
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const PageHeading(
-        'Registrar productos',
-        'Dale un lugar a la próxima pieza de tu catálogo.',
-      ),
-      LayoutBuilder(
-        builder: (context, c) {
-          final fields = Card(
-            child: Padding(
-              padding: const EdgeInsets.all(28),
-              child: Form(
-                key: form,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Información del producto',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 6),
-                    const Text('Los campos con * son obligatorios.'),
-                    const SizedBox(height: 28),
-                    TextFormField(
-                      key: const Key('product-name'),
-                      controller: name,
-                      maxLength: 80,
-                      validator: requiredText,
-                      textCapitalization: TextCapitalization.sentences,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (_) => setState(() {}),
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre del producto *',
-                        hintText: 'Ej. Laptop Pro 14',
+  Widget build(BuildContext context) => Form(
+    key: form,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'REGISTRAR\nPRODUCTOS',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+            height: 1,
+            color: ink,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        const SizedBox(height: 22),
+        InkWell(
+          onTap: picking ? null : pick,
+          child: BoldPanel(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                if (photo != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Photo(photo!, width: 48, height: 48),
+                  )
+                else
+                  const Icon(Icons.add_a_photo_outlined, size: 35),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        picking
+                            ? 'Abriendo…'
+                            : photo == null
+                            ? 'Subir fotografía'
+                            : 'Cambiar fotografía',
+                        style: const TextStyle(fontWeight: FontWeight.w800),
                       ),
-                    ),
-                    const SizedBox(height: 18),
-                    TextFormField(
-                      key: const Key('product-description'),
-                      controller: description,
-                      maxLength: 400,
-                      maxLines: 4,
-                      validator: requiredText,
-                      onChanged: (_) => setState(() {}),
-                      decoration: const InputDecoration(
-                        labelText: 'Descripción *',
-                        alignLabelWithHint: true,
-                        hintText: '¿Qué hace especial a este producto?',
+                      const Text(
+                        'JPG o PNG · máximo 2 MB',
+                        style: TextStyle(fontSize: 11),
                       ),
-                    ),
-                    const SizedBox(height: 18),
-                    DropdownButtonFormField<String>(
-                      isExpanded: true,
-                      initialValue: category,
-                      decoration: const InputDecoration(labelText: 'Categoría'),
-                      items: categories
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                      onChanged: saving
-                          ? null
-                          : (v) => setState(() => category = v!),
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      key: const Key('product-price'),
-                      controller: price,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      validator: (v) => parseCents(v ?? '') == null
-                          ? 'Ingresa un precio mayor a 0, con hasta 2 decimales.'
-                          : null,
-                      onChanged: (_) => setState(() {}),
-                      onFieldSubmitted: (_) => save(),
-                      decoration: const InputDecoration(
-                        labelText: 'Precio *',
-                        prefixText: 'S/  ',
-                        hintText: '0.00',
-                        helperText: 'Moneda: soles peruanos (PEN).',
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    const Divider(),
-                    const SizedBox(height: 20),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        ActionButton.icon(
-                          onPressed: saving ? null : save,
-                          icon: const Icon(Icons.check_rounded, size: 19),
-                          label: Text(
-                            saving ? 'Guardando…' : 'Guardar producto',
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: saving
-                              ? null
-                              : () {
-                                  form.currentState!.reset();
-                                  name.clear();
-                                  description.clear();
-                                  price.clear();
-                                  setState(() => category = categories.first);
-                                },
-                          child: const Text('Limpiar campos'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-          final preview = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Vista previa',
-                style: TextStyle(
-                  color: ink,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text('Así se verá en tu catálogo.'),
-              const SizedBox(height: 18),
-              Card(
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Photo(
-                      categoryImage(category),
-                      width: double.infinity,
-                      height: 210,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(22),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Tag(category),
-                          const SizedBox(height: 16),
-                          Text(
-                            name.text.trim().isEmpty
-                                ? 'Tu próximo producto'
-                                : name.text.trim(),
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            description.text.trim().isEmpty
-                                ? 'Una buena descripción marca la diferencia.'
-                                : description.text.trim(),
-                          ),
-                          const SizedBox(height: 22),
-                          Text(
-                            'S/ ${((parseCents(price.text) ?? 0) / 100).toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 25,
-                              color: forest,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.info_outline, size: 18, color: muted),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'La fotografía referencial se asigna según la categoría. Los cambios se guardan en este navegador.',
-                      style: TextStyle(fontSize: 12),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          );
-          return c.maxWidth >= 850
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 3, child: fields),
-                    const SizedBox(width: 28),
-                    Expanded(flex: 2, child: preview),
-                  ],
-                )
-              : Column(children: [fields, const SizedBox(height: 28), preview]);
-        },
-      ),
-    ],
+                ),
+                const Icon(Icons.add_circle_outline),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        TextFormField(
+          key: const Key('product-name'),
+          controller: name,
+          maxLength: 80,
+          validator: requiredText,
+          textInputAction: TextInputAction.next,
+          decoration: const InputDecoration(
+            labelText: 'Nombre del producto *',
+            counterText: '',
+            hintText: 'Ej. Laptop Pro 16',
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          key: const Key('product-description'),
+          controller: description,
+          maxLength: 400,
+          maxLines: 3,
+          validator: requiredText,
+          decoration: const InputDecoration(
+            labelText: 'Descripción *',
+            counterText: '',
+            alignLabelWithHint: true,
+          ),
+        ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<String>(
+          initialValue: category,
+          isExpanded: true,
+          decoration: const InputDecoration(labelText: 'Categoría'),
+          items: categories
+              .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+              .toList(),
+          onChanged: saving ? null : (c) => setState(() => category = c!),
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          key: const Key('product-price'),
+          controller: price,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          validator: (v) => parseCents(v ?? '') == null
+              ? 'Ingresa un precio mayor a 0.'
+              : null,
+          onFieldSubmitted: (_) => save(),
+          decoration: const InputDecoration(
+            labelText: 'Precio *',
+            prefixText: 'S/ ',
+            fillColor: mint,
+            hintText: '0.00',
+          ),
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          child: ActionButton.icon(
+            onPressed: saving ? null : save,
+            icon: const Icon(Icons.check_rounded),
+            label: Text(saving ? 'Guardando…' : 'Guardar producto'),
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
+    ),
   );
 }

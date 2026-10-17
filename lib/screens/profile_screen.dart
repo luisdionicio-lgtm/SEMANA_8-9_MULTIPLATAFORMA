@@ -38,11 +38,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         editing = false;
         saving = false;
       });
-      message(context, 'Tu perfil se actualizó correctamente.');
+      message(context, 'Perfil actualizado.');
     } catch (_) {
       if (mounted) {
         setState(() => saving = false);
-        message(context, 'No se pudo guardar el perfil. Inténtalo otra vez.');
+        message(context, 'No se pudo guardar. Inténtalo otra vez.');
       }
     }
   }
@@ -51,178 +51,139 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const PageHeading(
-        'Perfil',
-        'Los detalles que hacen tu espacio más tuyo.',
+      const Text(
+        'PERFIL',
+        style: TextStyle(
+          fontSize: 42,
+          fontWeight: FontWeight.w900,
+          height: 1,
+          color: ink,
+        ),
       ),
-      LayoutBuilder(
-        builder: (context, c) {
-          final identity = Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 28,
-                    backgroundColor: mint,
-                    child: Icon(
-                      Icons.person_outline_rounded,
-                      color: forest,
-                      size: 30,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.store.name,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          widget.store.email,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Administrador demo',
-                          style: TextStyle(color: forest, fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-          final details = Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: form,
+      const SizedBox(height: 22),
+      BoldPanel(
+        color: coral,
+        padding: const EdgeInsets.all(8),
+        child: Container(
+          padding: const EdgeInsets.all(13),
+          color: surface,
+          child: Row(
+            children: [
+              const ProfilePhoto(radius: 34),
+              const SizedBox(width: 14),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Información personal',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text('Mantén actualizados tus datos de contacto.'),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: name,
-                      readOnly: !editing,
-                      validator: requiredText,
-                      maxLength: 80,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre',
-                        counterText: '',
-                        prefixIcon: Icon(
-                          Icons.person_outline_rounded,
-                          size: 20,
-                        ),
+                      widget.store.name.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        height: 1.1,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: email,
-                      readOnly: !editing,
-                      validator: emailValidator,
-                      keyboardType: TextInputType.emailAddress,
-                      maxLength: 120,
-                      decoration: const InputDecoration(
-                        labelText: 'Correo',
-                        counterText: '',
-                        prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      controller: phone,
-                      readOnly: !editing,
-                      validator: (v) =>
-                          v == null ||
-                              !RegExp(
-                                r'^\+?[\d\s()-]{7,20}$',
-                              ).hasMatch(v.trim())
-                          ? 'Ingresa un teléfono válido (7 a 20 caracteres).'
-                          : null,
-                      keyboardType: TextInputType.phone,
-                      maxLength: 20,
-                      decoration: const InputDecoration(
-                        labelText: 'Teléfono',
-                        prefixIcon: Icon(Icons.phone_outlined, size: 20),
-                      ),
-                    ),
-                    const SizedBox(height: 26),
-                    const Divider(),
-                    const SizedBox(height: 20),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        ActionButton.icon(
-                          onPressed: saving
-                              ? null
-                              : () {
-                                  if (editing) {
-                                    save();
-                                  } else {
-                                    setState(() => editing = true);
-                                  }
-                                },
-                          icon: Icon(
-                            editing ? Icons.check_rounded : Icons.edit_outlined,
-                            size: 18,
-                          ),
-                          label: Text(
-                            saving
-                                ? 'Guardando…'
-                                : editing
-                                ? 'Guardar cambios'
-                                : 'Editar perfil',
-                          ),
-                        ),
-                        if (editing)
-                          TextButton(
-                            onPressed: saving
-                                ? null
-                                : () {
-                                    name.text = widget.store.name;
-                                    email.text = widget.store.email;
-                                    phone.text = widget.store.phone;
-                                    setState(() => editing = false);
-                                  },
-                            child: const Text('Cancelar'),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 9),
                     const Text(
-                      'Perfil de ejemplo guardado en este navegador. Usa datos ficticios para el laboratorio. Editar el correo del perfil no modifica el acceso demo.',
-                      style: TextStyle(fontSize: 11),
+                      'Cuenta de demostración',
+                      style: TextStyle(fontSize: 11, color: muted),
                     ),
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(height: 24),
+      Form(
+        key: form,
+        child: Column(
+          children: [
+            TextFormField(
+              controller: name,
+              readOnly: !editing,
+              validator: requiredText,
+              maxLength: 80,
+              decoration: const InputDecoration(
+                labelText: 'Nombre',
+                counterText: '',
+                fillColor: mint,
+                prefixIcon: Icon(Icons.person_outline_rounded),
+              ),
             ),
-          );
-          return c.maxWidth >= 850
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(flex: 2, child: identity),
-                    const SizedBox(width: 28),
-                    Expanded(flex: 3, child: details),
-                  ],
-                )
-              : Column(
-                  children: [identity, const SizedBox(height: 24), details],
-                );
-        },
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: email,
+              readOnly: !editing,
+              validator: emailValidator,
+              maxLength: 120,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Correo',
+                counterText: '',
+                fillColor: surface,
+                prefixIcon: Icon(Icons.mail_outline_rounded),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: phone,
+              readOnly: !editing,
+              maxLength: 20,
+              keyboardType: TextInputType.phone,
+              validator: (v) =>
+                  v == null ||
+                      !RegExp(r'^\+?[\d\s()-]{7,20}$').hasMatch(v.trim())
+                  ? 'Ingresa un teléfono válido.'
+                  : null,
+              decoration: const InputDecoration(
+                labelText: 'Teléfono',
+                counterText: '',
+                prefixIcon: Icon(Icons.phone_outlined),
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ActionButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: coral,
+                  foregroundColor: ink,
+                ),
+                onPressed: saving
+                    ? null
+                    : () {
+                        if (editing) {
+                          save();
+                        } else {
+                          setState(() => editing = true);
+                        }
+                      },
+                icon: Icon(editing ? Icons.check : Icons.arrow_forward_rounded),
+                label: Text(
+                  saving
+                      ? 'Guardando…'
+                      : editing
+                      ? 'Guardar cambios'
+                      : 'Editar perfil',
+                ),
+              ),
+            ),
+            if (editing)
+              TextButton(
+                onPressed: saving
+                    ? null
+                    : () {
+                        name.text = widget.store.name;
+                        email.text = widget.store.email;
+                        phone.text = widget.store.phone;
+                        setState(() => editing = false);
+                      },
+                child: const Text('Cancelar'),
+              ),
+          ],
+        ),
       ),
     ],
   );

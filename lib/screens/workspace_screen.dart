@@ -95,35 +95,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                 ),
               ),
             const Spacer(),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: const Color(0xFF121C31),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.code_rounded, color: forest, size: 22),
-                  SizedBox(height: 10),
-                  Text(
-                    'Hecho con Flutter',
-                    style: TextStyle(
-                      color: ink,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    'Un catálogo, todas tus ideas.',
-                    style: TextStyle(fontSize: 11, color: muted),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
             const Divider(),
             ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -155,10 +126,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         final desktop = c.maxWidth >= 1050;
         return Scaffold(
           key: scaffold,
+          backgroundColor: [const Color(0xFF102D2C), coral, forest, mint][page],
           bottomNavigationBar: NavigationBar(
             selectedIndex: page,
             onDestinationSelected: navigate,
-            height: 72,
+            height: 66,
             backgroundColor: surface,
             indicatorColor: mint,
             destinations: const [
@@ -191,12 +163,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                 child: Column(
                   children: [
                     Container(
-                      height: 70,
+                      height: 60,
                       padding: EdgeInsets.symmetric(
                         horizontal: desktop ? 38 : 16,
                       ),
                       decoration: const BoxDecoration(
-                        color: surface,
+                        color: ink,
                         border: Border(bottom: BorderSide(color: line)),
                       ),
                       child: Row(
@@ -206,7 +178,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                               tooltip: 'Abrir menú',
                               onPressed: () =>
                                   scaffold.currentState!.openDrawer(),
-                              icon: const Icon(Icons.menu_rounded),
+                              icon: const Icon(
+                                Icons.menu_rounded,
+                                color: Colors.white,
+                              ),
                             ),
                           if (desktop) ...[
                             const Text(
@@ -228,7 +203,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: ink,
+                                color: Colors.white,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -243,15 +218,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                             onTap: () => navigate(3),
                             child: Row(
                               children: [
-                                const CircleAvatar(
-                                  radius: 19,
-                                  backgroundColor: mint,
-                                  child: Icon(
-                                    Icons.person_outline_rounded,
-                                    color: forest,
-                                    size: 21,
-                                  ),
-                                ),
+                                const ProfilePhoto(),
                                 if (c.maxWidth > 650) ...[
                                   const SizedBox(width: 11),
                                   Column(
@@ -286,7 +253,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                     Expanded(
                       child: SingleChildScrollView(
                         key: ValueKey('page-scroll-$page'),
-                        padding: EdgeInsets.all(desktop ? 38 : 20),
+                        padding: EdgeInsets.all(desktop ? 38 : 16),
                         child: Align(
                           alignment: Alignment.topCenter,
                           child: ConstrainedBox(
@@ -322,29 +289,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                     _ => home(context),
                                   },
                                 ),
-                                const SizedBox(height: 38),
-                                const Divider(),
-                                const SizedBox(height: 12),
-                                const Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        'Órbita · Tecnología que conecta',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: muted,
-                                        ),
-                                      ),
-                                    ),
-                                    Text(
-                                      'Flutter web',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: muted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ],
                             ),
                           ),
@@ -363,68 +307,157 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   Widget home(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      PageHeading(
-        'Tu próxima órbita.',
-        'Hola, ${widget.store.name.split(' ').first}. Encuentra lo que mueve tus ideas.',
+      const Text(
+        'MENÚ',
+        style: TextStyle(
+          fontSize: 44,
+          fontWeight: FontWeight.w900,
+          color: Colors.white,
+          height: 1,
+        ),
       ),
+      const SizedBox(height: 20),
+      BoldPanel(
+        color: ink,
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'VALOR DEL CATÁLOGO',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: mint,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    'S/ ${(widget.store.products.fold<int>(0, (total, p) => total + p.cents) / 100).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: mint,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 25,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              '${widget.store.products.length} productos',
+              style: const TextStyle(color: cyan, fontSize: 11),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 24),
+      GridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 14,
+        childAspectRatio: 1,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          menuTile(
+            'Registrar\nproductos',
+            Icons.add_box_outlined,
+            mint,
+            () => navigate(1),
+          ),
+          menuTile(
+            'Listar\nproductos',
+            Icons.format_list_bulleted_rounded,
+            coral,
+            () => navigate(2),
+          ),
+          menuTile(
+            'Perfil',
+            Icons.person_outline_rounded,
+            forest,
+            () => navigate(3),
+            light: true,
+          ),
+          menuTile(
+            'Logout',
+            Icons.logout_rounded,
+            const Color(0xFFFFC400),
+            widget.onLogout,
+          ),
+        ],
+      ),
+      const SizedBox(height: 30),
+      const Text(
+        'EN TU ÓRBITA',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w900,
+          fontSize: 22,
+        ),
+      ),
+      const SizedBox(height: 14),
       DiscoveryCarousel(
         onExplore: (category) => setState(() {
           selectedCategory = category;
           page = 2;
         }),
       ),
-      const SizedBox(height: 24),
-      Row(
-        children: [
-          Expanded(
-            child: Text(
-              'En tu radar',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-          TextButton(
-            onPressed: () => navigate(2),
-            child: const Text('Ver catálogo'),
-          ),
-        ],
-      ),
-      const SizedBox(height: 14),
+      const SizedBox(height: 20),
       ProductCarousel(
         products: widget.store.products,
         onView: () => navigate(2),
       ),
-      const SizedBox(height: 30),
-      Card(
-        child: Padding(
-          padding: const EdgeInsets.all(22),
-          child: Row(
-            children: [
-              const Icon(Icons.add_box_outlined, color: forest, size: 28),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Haz crecer tu catálogo',
-                      style: TextStyle(color: ink, fontWeight: FontWeight.w800),
+    ],
+  );
+  Widget menuTile(
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap, {
+    bool light = false,
+  }) => Material(
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: BoldPanel(
+        color: color,
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: light ? Colors.white : ink, size: 24),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    title,
+                    softWrap: false,
+                    style: TextStyle(
+                      color: light ? Colors.white : ink,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 20,
+                      height: 1.1,
                     ),
-                    const SizedBox(height: 5),
-                    const Text(
-                      'Una nueva pieza. Más posibilidades.',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    TextButton(
-                      onPressed: () => navigate(1),
-                      child: const Text('Registrar producto'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 7),
+            Icon(
+              Icons.arrow_forward_rounded,
+              size: 18,
+              color: light ? Colors.white : ink,
+            ),
+          ],
         ),
       ),
-    ],
+    ),
   );
 }

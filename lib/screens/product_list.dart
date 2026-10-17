@@ -20,7 +20,8 @@ class ProductList extends StatefulWidget {
 
 class _ProductListState extends State<ProductList> {
   final search = TextEditingController();
-  String category = 'Todos', sort = 'Recientes';
+  late String category;
+  String sort = 'Catálogo';
   @override
   void initState() {
     super.initState();
@@ -35,29 +36,35 @@ class _ProductListState extends State<ProductList> {
 
   @override
   Widget build(BuildContext context) {
-    final query = search.text.trim().toLowerCase();
+    final q = search.text.trim().toLowerCase();
     final products = widget.store.products
         .where(
           (p) =>
-              (category == 'Todos' || p.category == category) &&
-              (p.name.toLowerCase().contains(query) ||
-                  p.description.toLowerCase().contains(query)),
+              (category == 'Todos' || category == p.category) &&
+              (p.name.toLowerCase().contains(q) ||
+                  p.description.toLowerCase().contains(q) ||
+                  p.id.toLowerCase().contains(q)),
         )
         .toList();
     if (sort == 'Menor precio') {
       products.sort((a, b) => a.cents.compareTo(b.cents));
-    } else if (sort == 'Mayor precio') {
+    }
+    if (sort == 'Mayor precio') {
       products.sort((a, b) => b.cents.compareTo(a.cents));
-    } else {
-      final reversed = products.reversed.toList();
-      products
-        ..clear()
-        ..addAll(reversed);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const PageHeading('Listar productos', 'Tecnología para lo que viene.'),
+        const Text(
+          'LISTAR\nPRODUCTOS',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 31,
+            height: 1,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 22),
         Row(
           children: [
             Expanded(
@@ -66,9 +73,9 @@ class _ProductListState extends State<ProductList> {
                 controller: search,
                 onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
-                  hintText: 'Buscar productos…',
-                  prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                  suffixIcon: search.text.isEmpty
+                  hintText: 'Buscar producto…',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: q.isEmpty
                       ? null
                       : IconButton(
                           tooltip: 'Limpiar búsqueda',
@@ -76,19 +83,17 @@ class _ProductListState extends State<ProductList> {
                             search.clear();
                             setState(() {});
                           },
-                          icon: const Icon(Icons.close, size: 18),
+                          icon: const Icon(Icons.close),
                         ),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
             PopupMenuButton<String>(
               tooltip: 'Ordenar productos',
-              initialValue: sort,
+              icon: const Icon(Icons.tune, color: Colors.white),
               onSelected: (s) => setState(() => sort = s),
-              icon: const Icon(Icons.tune_rounded),
-              itemBuilder: (context) => [
-                'Recientes',
+              itemBuilder: (_) => [
+                'Catálogo',
                 'Menor precio',
                 'Mayor precio',
               ].map((s) => PopupMenuItem(value: s, child: Text(s))).toList(),
@@ -96,174 +101,148 @@ class _ProductListState extends State<ProductList> {
           ],
         ),
         const SizedBox(height: 18),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: ['Todos', ...categories]
-              .map(
-                (cat) => ChoiceChip(
-                  label: Text(cat, style: const TextStyle(fontSize: 12)),
-                  selected: cat == category,
-                  onSelected: (_) => setState(() => category = cat),
-                  selectedColor: mint,
-                  showCheckmark: false,
-                  side: BorderSide(color: cat == category ? forest : line),
-                ),
-              )
-              .toList(),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: ['Todos', ...categories]
+                .map(
+                  (c) => Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(
+                        c,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: ink,
+                          fontSize: 12,
+                        ),
+                      ),
+                      selected: category == c,
+                      onSelected: (_) => setState(() => category = c),
+                      selectedColor: mint,
+                      backgroundColor: surface,
+                      showCheckmark: false,
+                      side: const BorderSide(color: ink, width: 2),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
         ),
-        const SizedBox(height: 24),
-        Wrap(
-          spacing: 18,
-          runSpacing: 8,
-          children: [
-            Text(
-              '${products.length} productos',
-              style: const TextStyle(color: ink, fontWeight: FontWeight.w800),
-            ),
-            const Text(
-              'Precios en soles · PEN',
-              style: TextStyle(fontSize: 11),
-            ),
-          ],
-        ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 22),
         if (products.isEmpty)
-          Card(
-            child: SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(40),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.search_off_rounded,
-                      size: 44,
-                      color: muted,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No encontramos productos',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text('Prueba con otro nombre o cambia la categoría.'),
-                    const SizedBox(height: 18),
-                    OutlinedButton(
-                      onPressed: () {
-                        search.clear();
-                        setState(() => category = 'Todos');
-                      },
-                      child: const Text('Restablecer filtros'),
-                    ),
-                  ],
+          BoldPanel(
+            child: Column(
+              children: [
+                const Icon(Icons.search_off, size: 40),
+                const SizedBox(height: 12),
+                const Text(
+                  'No encontramos productos',
+                  style: TextStyle(fontWeight: FontWeight.w800),
                 ),
-              ),
+                TextButton(
+                  onPressed: () {
+                    search.clear();
+                    setState(() => category = 'Todos');
+                  },
+                  child: const Text('Restablecer filtros'),
+                ),
+              ],
             ),
           )
         else
-          GridView.builder(
+          ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              mainAxisExtent: 260,
-            ),
             itemCount: products.length,
-            itemBuilder: (context, i) => productTile(context, products[i]),
+            separatorBuilder: (_, _) => const SizedBox(height: 16),
+            itemBuilder: (context, i) => tile(context, products[i], i),
           ),
-        const SizedBox(height: 14),
-        const Text(
-          'Catálogo de demostración · Las fotografías son referenciales.',
-          style: TextStyle(fontSize: 11),
+        const SizedBox(height: 16),
+        Text(
+          '${products.length} productos · precios en soles',
+          style: const TextStyle(color: Colors.white70, fontSize: 11),
         ),
       ],
     );
   }
 
-  Widget productTile(BuildContext context, Product p) => Card(
-    clipBehavior: Clip.antiAlias,
-    child: InkWell(
-      onTap: () => showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(p.name),
-          content: SingleChildScrollView(
+  Widget tile(BuildContext context, Product p, int index) => InkWell(
+    onTap: () => showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(p.name),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Photo(p.image, width: 260, height: 170),
+              const SizedBox(height: 16),
+              Text(p.description),
+              const SizedBox(height: 12),
+              Text(
+                p.price,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 23,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    ),
+    child: BoldPanel(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Photo(p.image, width: 56, height: 60),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Photo(p.image, width: 280, height: 170),
+                Text(
+                  p.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    height: 1.1,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-                const SizedBox(height: 18),
-                Tag(p.category),
-                const SizedBox(height: 14),
-                Text(p.description),
-                const SizedBox(height: 18),
-                Text(p.price, style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 5),
+                Text(
+                  p.id.length > 12
+                      ? 'OR-${p.id.substring(p.id.length - 6)}'
+                      : p.id,
+                  style: const TextStyle(fontSize: 9, color: muted),
+                ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cerrar'),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+            decoration: BoxDecoration(
+              color: [mint, coral, cyan, const Color(0xFFFFC400)][index % 4],
+              border: Border.all(color: ink, width: 2),
+              borderRadius: BorderRadius.circular(4),
             ),
-          ],
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Photo(p.image, width: double.infinity, height: 120),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(13),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    p.category,
-                    style: const TextStyle(color: muted, fontSize: 10),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    p.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: ink,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                      height: 1.3,
-                    ),
-                  ),
-                  const Spacer(),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          p.price,
-                          style: const TextStyle(
-                            color: forest,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      const Icon(
-                        Icons.arrow_outward_rounded,
-                        size: 17,
-                        color: muted,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            child: Text(
+              p.price.replaceAll('.00', ''),
+              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
             ),
           ),
         ],

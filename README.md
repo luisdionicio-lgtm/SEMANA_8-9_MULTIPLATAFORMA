@@ -1,96 +1,69 @@
 # Órbita · Laboratorio 08 / 09
 
-Aplicación **Flutter web + Dart, siempre en formato celular (máximo 430 px)** para una tienda de tecnología. Implementa las cinco pantallas de la referencia: login, menú, registrar productos, listar productos y perfil editable.
+Aplicación Flutter web + Dart para una tienda tecnológica: login, menú, registro de productos, listado y perfil editable. En PC se presenta un teléfono estilizado de hasta 376 × 812 px sobre un fondo tecnológico.
 
 Repositorio: https://github.com/luisdionicio-lgtm/SEMANA_8-9_MULTIPLATAFORMA
 
-## Ejecutar
+## Ejecutar desde Visual Studio Code
+
+Abrir esta carpeta y ejecutar en su terminal:
 
 ```powershell
-flutter pub get
-flutter run -d chrome --web-port 8080
+& "D:/flutter/flutter/bin/flutter.bat" pub get
+& "D:/flutter/flutter/bin/flutter.bat" run -d chrome --web-port 8082
 ```
 
-Si Flutter no está en PATH en esta PC:
+Abrir http://localhost:8082. Si Flutter está en PATH, basta con `flutter run -d chrome --web-port 8082`.
 
-```powershell
-& D:/flutter/flutter/bin/flutter.bat run -d chrome --web-port 8080
-```
+También se incluye la tarea **Órbita: ejecutar Flutter Web**: `Ctrl + Shift + B` abre la terminal integrada y ejecuta el proyecto. `.vscode/settings.json` apunta al SDK instalado en esta PC; ajustar esa ruta si se clona en otro equipo. La configuración de depuración con F5 usa Chrome en el puerto 8081.
 
-También puede servirse la compilación con cualquier servidor estático:
+Acceso de demostración: **demo@orbita.pe** / **Demo2026!**. El botón «Completar datos de prueba» completa el formulario. Para detener Flutter, `Ctrl + C` en su terminal.
 
-```powershell
-flutter build web --release
-python -m http.server 8080 --bind 127.0.0.1 --directory build/web
-```
+## Pantallas y funciones
 
-Abrir http://127.0.0.1:8080. Ingreso de prueba: **demo@orbita.pe** / **Demo2026!**. El botón «Completar datos de prueba» prepara el formulario.
+- Login con validación y contraseña visible/oculta.
+- Menú de cuatro bloques: registrar, listar, perfil y logout. Valor total calculado a partir del catálogo real y dos carruseles interactivos.
+- Registro de nombre, descripción, categoría y precio en soles. Carga opcional de fotografía JPG/PNG de hasta 2 MB; se guarda localmente con el producto.
+- Listado en filas compactas, búsqueda por nombre, descripción o código, filtro de categoría, orden de precios y detalle.
+- Perfil con fotografía referencial, nombre, correo y teléfono editables.
 
-## Pantallas para las capturas
+Datos iniciales: Laptop S/ 2500, Mouse S/ 80, Teclado S/ 120 y Monitor S/ 900. Los datos se mantienen al recargar mediante SharedPreferences. Cambiar de pantalla reinicia el desplazamiento sin perder productos ni perfil guardados.
 
-1. **Login:** correo, contraseña, visibilidad y validación.
-2. **Menú:** accesos a registrar, listar, perfil y cerrar sesión.
-3. **Registrar productos:** nombre, descripción, categoría y precio en S/. Vista previa en vivo. «Guardar producto» abre el listado.
-4. **Listar productos:** Laptop S/ 2500, Mouse S/ 80, Teclado S/ 120 y Monitor S/ 900; cuadrícula de dos columnas, búsqueda, filtros, orden de precios y detalle al pulsar una tarjeta.
-5. **Perfil:** Juan Pérez, juan@email.com y 987 654 321. «Editar perfil» habilita los campos y permite guardar o cancelar.
+## Diseño y estructura
 
-Para reproducir las capturas iniciales usa una ventana privada o elimina solo las claves `orbita.products.v1` y `orbita.profile.v1` del almacenamiento local del sitio. No se requiere registrar datos personales reales.
-
-## Estructura
-
-Se conserva el proyecto Flutter original y sus carpetas de plataformas.
+Estilo basado en las últimas referencias proporcionadas: violeta, lima y coral; bordes negros y sombras de bloque. Formularios claros, controles Material, foto de perfil, teléfono delgado y textos breves. Botones con respuesta de presión de 120 ms, carruseles con transición de 250 ms y respeto por movimiento reducido.
 
 ```text
 lib/
-  main.dart                    # Arranque y estado del acceso demo
-  models/product.dart          # Producto, datos de ejemplo y precios en céntimos
-  services/app_store.dart      # Persistencia local y notificación del estado
-  theme/app_theme.dart         # Tema global Material 3
-  widgets/common.dart          # Marca, imágenes y validadores
-  widgets/carousels.dart       # Carruseles de colecciones y productos
-  screens/
-    login_screen.dart
-    workspace_screen.dart      # Menú y composición responsive
-    product_form.dart
-    product_list.dart
-    profile_screen.dart
-assets/images/                 # Fotografías locales
-assets/fonts/                  # Manrope y licencia OFL
-test/widget_test.dart          # Pruebas del dominio y flujo completo
+  main.dart                 # Arranque y marco de celular
+  models/product.dart       # Productos y precios en céntimos
+  services/app_store.dart    # Estado y persistencia local
+  theme/app_theme.dart      # Tema global
+  widgets/common.dart       # Marca, fotos, paneles y validadores
+  widgets/carousels.dart    # Carruseles de colecciones y productos
+  screens/                  # Las cinco pantallas del laboratorio
+assets/images/              # Fotografías locales, incluida la de perfil
+assets/fonts/               # Manrope estática y licencia OFL
+.vscode/                    # SDK, depuración y tarea de terminal
+test/widget_test.dart       # Pruebas del dominio y flujo completo
 ```
 
-## Correspondencia con la enseñanza
-
-- `ThemeData`: tema global para reducir duplicación.
-- `Card`: superficies consistentes para formularios, perfil y catálogo.
-- `ImageProvider` / `AssetImage`: imágenes incluidas en el bundle.
-- `FadeInImage`: placeholder en memoria y aparición gradual, respetando la preferencia de movimiento reducido.
-- `ListView.separated`: listado construido a partir de objetos `Product`.
-- `Form` / `TextFormField`: validación y controladores que se liberan con `dispose`.
-
-Las ampliaciones están comentadas en código: `ChangeNotifier` y `ListenableBuilder` comparten el estado; `SharedPreferences` conserva productos/perfil; `LayoutBuilder` mantiene un viewport celular en PC y móvil; céntimos enteros evitan errores monetarios; manejo de errores de almacenamiento evita anunciar guardados fallidos.
+Se conserva la estructura original Flutter con carpetas android, macos y web. Se aplican tema global, Card, imágenes y FadeInImage de la enseñanza; las ampliaciones están comentadas en código.
 
 ## Seguridad y alcance
 
-Este es un laboratorio **sin backend**. El login es una puerta de demostración, no autenticación de producción: las credenciales públicas de prueba se incluyen intencionalmente y no protegen los datos. No se guardan contraseña, token ni sesión. Al recargar se vuelve al login. Productos y perfil ficticio se guardan sin cifrado en el almacenamiento del navegador; otras personas con acceso a ese navegador pueden leerlos.
+El login es de demostración y no reemplaza autenticación de servidor. No se guarda contraseña, token ni sesión. Productos, fotografías seleccionadas y perfil ficticio se guardan sin cifrado en este navegador: usar datos de prueba.
 
-`.gitignore` **no cifra**: excluye `.env`, claves privadas, certificados, keystores, credenciales y artefactos de compilación. El proyecto no requiere secretos y no incluye claves de servicios. Para producción se necesita autenticación del servidor, autorización por usuario, HTTPS y almacenamiento protegido. Nunca colocar secretos en Dart web: el bundle es público.
+`.gitignore` excluye variables de entorno, claves privadas, certificados, credenciales y artefactos de compilación; no cifra archivos. El proyecto no necesita secretos. Para producción hacen falta backend, autenticación, autorización y HTTPS.
 
 ## Verificación
 
 ```powershell
 flutter analyze
 flutter test
-flutter build web --release
+flutter build web --release --pwa-strategy=none
 ```
 
-Pruebas: validación de importes, recuperación ante datos corruptos, persistencia, login, registro, búsqueda vacía, edición de perfil y logout.
+Pruebas de precios, recuperación de almacenamiento corrupto, persistencia y flujo de login, carrusel, filtro, registro, búsqueda, edición de perfil y logout.
 
-Fuentes y licencias de imágenes: [docs/FUENTES.md](docs/FUENTES.md).
-Documentación oficial utilizada: [formularios](https://docs.flutter.dev/cookbook/forms/validation), [imágenes progresivas](https://docs.flutter.dev/cookbook/images/fading-in-images), [navegación](https://docs.flutter.dev/ui/navigation), [clases Dart](https://dart.dev/language/classes).
-
-## Diseño móvil en navegador
-
-En PC se presenta un teléfono funcional centrado sobre un fondo fotográfico de escritorio tecnológico. La interfaz usa azul tinta, lavanda y tipografía Manrope; el catálogo tiene dos columnas y navegación inferior fija. Los botones reaccionan a la presión durante120ms y respetan movimiento reducido, siguiendo la skill local emil-design-eng y https://github.com/emilkowalski/skills.
-
-El inicio incluye dos carruseles: colecciones y productos en tu radar. Ambos admiten gestos táctiles y arrastre con mouse; las colecciones tienen flechas y selección de página. Explorar una colección aplica el filtro real del catálogo.
+Fuentes y licencias: [docs/FUENTES.md](docs/FUENTES.md). Documentación: [formularios Flutter](https://docs.flutter.dev/cookbook/forms/validation), [FadeInImage](https://docs.flutter.dev/cookbook/images/fading-in-images), [image_picker](https://pub.dev/packages/image_picker), [clases Dart](https://dart.dev/language/classes).

@@ -14,3 +14,5 @@ Fotografías referenciales de Unsplash, descargadas como JPG a assets/images par
 La referencia de escritorio fue revisada en el navegador integrado: Chrome no estaba conectado a las herramientas de esta sesión.
 
 Manrope: https://github.com/google/fonts/tree/main/ofl/manrope — licencia OFL incluida en assets/fonts/OFL.txt. Los iconos Material pertenecen al SDK Flutter.
+
+Foto de perfil ficticia: https://images.unsplash.com/photo-1500648767791-00dcc994a43e — Unsplash License. No representa al usuario real.

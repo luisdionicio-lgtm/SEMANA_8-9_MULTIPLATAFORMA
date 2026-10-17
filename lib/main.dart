@@ -1,4 +1,5 @@
 import 'dart:ui' show PointerDeviceKind;
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/app_store.dart';
@@ -39,13 +40,15 @@ class _MyAppState extends State<MyApp> {
     builder: (context, child) => LayoutBuilder(
       builder: (context, limits) {
         final framed = limits.maxWidth >= 600;
-        final width = limits.maxWidth.clamp(0.0, 430.0);
         final height = framed
-            ? (limits.maxHeight - 40).clamp(0.0, 920.0)
+            ? math.min(limits.maxHeight - 48, 812.0)
             : limits.maxHeight;
+        final width = framed
+            ? math.min(376.0, height / 2.16)
+            : math.min(limits.maxWidth, 390.0);
         final screen = MediaQuery(
           data: MediaQuery.of(context).copyWith(
-            size: Size(width - (framed ? 14 : 0), height - (framed ? 42 : 0)),
+            size: Size(width - (framed ? 12 : 0), height - (framed ? 38 : 0)),
           ),
           child: child!,
         );
@@ -65,10 +68,10 @@ class _MyAppState extends State<MyApp> {
               child: Container(
                 width: width,
                 height: height,
-                padding: EdgeInsets.all(framed ? 7 : 0),
+                padding: EdgeInsets.all(framed ? 5 : 0),
                 decoration: BoxDecoration(
                   color: const Color(0xFF070B14),
-                  borderRadius: BorderRadius.circular(framed ? 43 : 0),
+                  borderRadius: BorderRadius.circular(framed ? 36 : 0),
                   border: framed
                       ? Border.all(color: const Color(0xFF596075), width: 1)
                       : null,
@@ -76,19 +79,19 @@ class _MyAppState extends State<MyApp> {
                       ? const [
                           BoxShadow(
                             color: Color(0x80000000),
-                            offset: Offset(0, 20),
-                            blurRadius: 60,
+                            offset: Offset(0, 14),
+                            blurRadius: 40,
                           ),
                         ]
                       : null,
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(framed ? 36 : 0),
+                  borderRadius: BorderRadius.circular(framed ? 30 : 0),
                   child: Column(
                     children: [
                       if (framed)
                         Container(
-                          height: 28,
+                          height: 26,
                           color: const Color(0xFF0D1426),
                           child: Row(
                             children: [
@@ -104,8 +107,8 @@ class _MyAppState extends State<MyApp> {
                               ),
                               const Spacer(),
                               Container(
-                                width: 75,
-                                height: 17,
+                                width: 64,
+                                height: 16,
                                 decoration: BoxDecoration(
                                   color: Colors.black,
                                   borderRadius: BorderRadius.circular(20),

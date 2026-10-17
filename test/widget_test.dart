@@ -57,7 +57,8 @@ void main() {
     await tester.tap(find.text('Ingresar'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull, reason: 'Login / menú');
-    expect(find.text('Tu próxima órbita.'), findsOneWidget);
+    expect(find.text('MENÚ'), findsOneWidget);
+    await tester.ensureVisible(find.byTooltip('Siguiente colección'));
     await tester.tap(find.byTooltip('Siguiente colección'));
     await tester.pumpAndSettle();
     expect(find.text('2 / 4'), findsOneWidget);

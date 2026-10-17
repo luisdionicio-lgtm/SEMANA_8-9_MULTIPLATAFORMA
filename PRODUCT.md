@@ -16,3 +16,5 @@ Presentación confirmada: web siempre en formato celular de hasta 430 px, inclus
 Referencia final confirmada: teléfono funcional sobre fondo tecnológico, interfaz azul tinta/lavanda, catálogo de dos columnas y navegación inferior fija.
 
 Marca final: Órbita. El usuario pidió carruseles y más animaciones: inicio con colecciones y productos destacados, feedback de presión, navegación por gestos y mouse.
+
+Referencia final vigente: estilos neobrutales aportados por el usuario (violeta/lima/coral, bordes negros y sombras de bloque), celular delgado máximo376x812, foto de perfil, menos información, registro con foto opcional JPG/PNG2MB y listado compacto en filas. Ejecutar desde terminal de VS Code y publicar todos los cambios en GitHub.

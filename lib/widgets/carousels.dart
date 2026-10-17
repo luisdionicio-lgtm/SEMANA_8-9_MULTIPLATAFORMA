@@ -20,25 +20,25 @@ class _DiscoveryCarouselState extends State<DiscoveryCarousel> {
     (
       'Laptops',
       'Ideas que\ntoman forma.',
-      'Tu próxima gran idea empieza con las herramientas correctas.',
+      'Herramientas para crear.',
       'laptop.jpg',
     ),
     (
       'Audio',
       'Tu mundo.\nA tu ritmo.',
-      'Encuentra espacio para escuchar, crear y concentrarte.',
+      'Sonido para tu día.',
       'headphones.jpg',
     ),
     (
       'Periféricos',
       'Cada detalle\nhace la diferencia.',
-      'Haz de tu escritorio un lugar que se sienta tuyo.',
+      'Tu escritorio, a tu manera.',
       'keyboard.jpg',
     ),
     (
       'Monitores',
       'Amplía tus\nposibilidades.',
-      'Más espacio para tus proyectos y todo lo que viene.',
+      'Más espacio para tus ideas.',
       'monitor.jpg',
     ),
   ];
@@ -68,7 +68,7 @@ class _DiscoveryCarouselState extends State<DiscoveryCarousel> {
       ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: SizedBox(
-          height: 320,
+          height: 280,
           child: PageView.builder(
             key: const Key('discovery-carousel'),
             controller: controller,
@@ -95,7 +95,7 @@ class _DiscoveryCarouselState extends State<DiscoveryCarousel> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -103,8 +103,8 @@ class _DiscoveryCarouselState extends State<DiscoveryCarousel> {
                         Text(
                           s.$2,
                           style: const TextStyle(
-                            color: ink,
-                            fontSize: 29,
+                            color: Colors.white,
+                            fontSize: 26,
                             fontWeight: FontWeight.w800,
                             height: 1.15,
                             letterSpacing: -.5,
@@ -164,7 +164,7 @@ class _DiscoveryCarouselState extends State<DiscoveryCarousel> {
                       ),
                       height: 6,
                       decoration: BoxDecoration(
-                        color: page == i ? forest : line,
+                        color: page == i ? mint : Colors.white38,
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),

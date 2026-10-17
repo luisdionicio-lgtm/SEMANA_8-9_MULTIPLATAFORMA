@@ -58,7 +58,9 @@ class Photo extends StatelessWidget {
           'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==',
         ),
       ),
-      image: AssetImage('assets/images/$file'),
+      image: file.startsWith('data:image/')
+          ? MemoryImage(UriData.parse(file).contentAsBytes())
+          : AssetImage('assets/images/$file') as ImageProvider,
       width: width,
       height: height,
       fit: fit,
@@ -103,15 +105,17 @@ class PageHeading extends StatelessWidget {
   const PageHeading(this.title, this.subtitle, {super.key, this.action});
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 28),
+    padding: const EdgeInsets.only(bottom: 20),
     child: LayoutBuilder(
       builder: (context, c) {
         final heading = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title, style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 8),
-            Text(subtitle),
+            if (subtitle.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(subtitle),
+            ],
           ],
         );
         return c.maxWidth < 650
@@ -194,5 +198,44 @@ class _ActionButtonState extends State<ActionButton> {
         child: widget.child,
       ),
     ),
+  );
+}
+
+class ProfilePhoto extends StatelessWidget {
+  final double radius;
+  const ProfilePhoto({super.key, this.radius = 20});
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'Foto de perfil de ejemplo',
+    image: true,
+    child: CircleAvatar(
+      radius: radius,
+      backgroundColor: mint,
+      backgroundImage: const AssetImage('assets/images/profile.jpg'),
+    ),
+  );
+}
+
+// Borde y sombra de bloque: lenguaje visual explícito de la referencia.
+class BoldPanel extends StatelessWidget {
+  final Widget child;
+  final Color color;
+  final EdgeInsets padding;
+  const BoldPanel({
+    super.key,
+    required this.child,
+    this.color = surface,
+    this.padding = const EdgeInsets.all(20),
+  });
+  @override
+  Widget build(BuildContext context) => Container(
+    decoration: BoxDecoration(
+      color: color,
+      border: Border.all(color: ink, width: 2),
+      borderRadius: BorderRadius.circular(8),
+      boxShadow: const [BoxShadow(color: ink, offset: Offset(4, 5))],
+    ),
+    padding: padding,
+    child: child,
   );
 }
