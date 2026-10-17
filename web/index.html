@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Órbita: catálogo de tecnología. Laboratorio de Flutter web con registro de productos y perfil.">
+  <meta name="theme-color" content="#174C3C">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Órbita">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Órbita — tu catálogo conectado</title>
+  <link rel="manifest" href="manifest.json">
+  <style>html,body{background:#f5f7f4;margin:0}::selection{background:#b8deca;color:#172f2a}#loading{font:16px sans-serif;color:#174c3c;display:grid;place-content:center;height:100vh}</style>
+</head>
+<body>
+  <div id="loading" role="status" aria-label="Cargando Órbita">Cargando Órbita…</div>
+  <script>window.addEventListener('flutter-first-frame',()=>document.getElementById('loading')?.remove());</script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
